@@ -62,9 +62,12 @@ export default function RegisterPage() {
     api
       .googleAuth(credential)
       .then((data) => {
-        setSession(data.access_token, data.full_name || "Community Member");
+        setSession(data.access_token, {
+          full_name: data.full_name || "Community Member",
+          is_admin: Boolean(data.is_admin),
+        });
         toast.success("Account created with Google.");
-        router.push("/");
+        router.push(data.is_admin ? "/admin" : "/");
       })
       .catch((requestError) => {
         const message = requestError.message || "Google sign-up failed";

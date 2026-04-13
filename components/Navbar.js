@@ -73,6 +73,7 @@ export default function Navbar() {
   }
 
   const isLoggedIn = Boolean(session.token && session.user);
+  const isAdmin = Boolean(session.user?.is_admin);
   const isLoginActive = router.pathname === "/login";
   const isRegisterActive = router.pathname === "/register";
 
@@ -111,6 +112,14 @@ export default function Navbar() {
                 </Link>
               );
             })}
+            {isAdmin ? (
+              <Link
+                href="/admin"
+                className={`nav-link${router.pathname.startsWith("/admin") ? " nav-link-active" : ""}`}
+              >
+                Admin
+              </Link>
+            ) : null}
           </nav>
 
           <div className="nav-actions">
