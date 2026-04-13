@@ -10,6 +10,13 @@ Set:
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
 
+For Vercel, `NEXT_PUBLIC_API_BASE_URL` must be your public backend URL, not `localhost`.
+Example:
+
+```text
+NEXT_PUBLIC_API_BASE_URL=https://your-backend-service.onrender.com
+```
+
 ## Run
 
 ```powershell
