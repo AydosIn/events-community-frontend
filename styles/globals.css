@@ -998,6 +998,91 @@ img {
   color: var(--primary);
 }
 
+.join-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(16, 35, 63, 0.48);
+  backdrop-filter: blur(6px);
+}
+
+.join-modal {
+  width: min(680px, 100%);
+  display: grid;
+  gap: 22px;
+  padding: 24px;
+  border: 1px solid rgba(166, 194, 225, 0.4);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 30px 80px rgba(16, 35, 63, 0.2);
+}
+
+.join-modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.join-modal-header p {
+  margin: 0;
+}
+
+.join-modal-close {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(166, 194, 225, 0.46);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--muted-strong);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.join-form,
+.join-form-grid,
+.join-form label {
+  display: grid;
+}
+
+.join-form {
+  gap: 18px;
+}
+
+.join-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.join-form label {
+  gap: 8px;
+  color: var(--muted-strong);
+  font-weight: 600;
+}
+
+.join-form input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(166, 194, 225, 0.48);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  color: var(--text);
+}
+
+.join-form-full {
+  grid-column: 1 / -1;
+}
+
+.join-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .button {
   display: inline-flex;
   align-items: center;
@@ -1425,7 +1510,8 @@ img {
 
   .opportunity-footer,
   .filter-status-row,
-  .filter-bar {
+  .filter-bar,
+  .join-modal-header {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -1439,6 +1525,7 @@ img {
   .filter-card,
   .stats-card,
   .opportunity-card,
+  .join-modal,
   .step-card,
   .info-card,
   .faq-card,
@@ -1510,8 +1597,17 @@ img {
   .hero-actions .button,
   .section-actions .button,
   .inline-actions .button,
-  .admin-hero-actions .button {
+  .admin-hero-actions .button,
+  .join-form-actions .button {
     width: 100%;
+  }
+
+  .join-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .join-form-full {
+    grid-column: auto;
   }
 
   .hero-strip {

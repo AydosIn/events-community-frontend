@@ -15,6 +15,22 @@ function isAuthError(message) {
   );
 }
 
+const initialRegistrationForm = {
+  first_name: "",
+  last_name: "",
+  age: "",
+  phone_number: "",
+  telegram_username: "",
+};
+
+function formatType(type) {
+  if (!type) {
+    return "Opportunity";
+  }
+
+  return type.charAt(0).toUpperCase() + type.slice(1);
+}
+
 export default function OpportunityListPage({ type, title, description }) {
   const router = useRouter();
   const [regionInput, setRegionInput] = useState("");
@@ -27,6 +43,8 @@ export default function OpportunityListPage({ type, title, description }) {
   const [loading, setLoading] = useState(true);
   const [registeringId, setRegisteringId] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [selectedOpportunity, setSelectedOpportunity] = useState(null);
+  const [registrationForm, setRegistrationForm] = useState(initialRegistrationForm);
   const toast = useToast();
 
   useEffect(() => {
@@ -112,26 +130,71 @@ export default function OpportunityListPage({ type, title, description }) {
     };
   }, [router, token]);
 
-  function handleRegister(opportunityId) {
+  function handleOpenRegister(opportunity) {
     if (!token) {
       clearSession();
       router.push("/login");
       return;
     }
 
+    setSelectedOpportunity(opportunity);
+    setRegistrationForm(initialRegistrationForm);
     setError("");
     setSuccessMessage("");
-    setRegisteringId(opportunityId);
+  }
+
+  function handleCloseRegister() {
+    setSelectedOpportunity(null);
+    setRegistrationForm(initialRegistrationForm);
+  }
+
+  function handleRegistrationChange(event) {
+    const { name, value } = event.target;
+    setRegistrationForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  }
+
+  function handleRegisterSubmit(event) {
+    event.preventDefault();
+
+    if (!token) {
+      clearSession();
+      router.push("/login");
+      return;
+    }
+
+    if (!selectedOpportunity) {
+      return;
+    }
+
+    setError("");
+    setSuccessMessage("");
+    setRegisteringId(selectedOpportunity.id);
 
     api
-      .registerForOpportunity(opportunityId, token)
+      .registerForOpportunity(
+        {
+          opportunity_id: selectedOpportunity.id,
+          first_name: registrationForm.first_name.trim(),
+          last_name: registrationForm.last_name.trim(),
+          age: Number(registrationForm.age),
+          phone_number: registrationForm.phone_number.trim(),
+          telegram_username: registrationForm.telegram_username.trim(),
+        },
+        token,
+      )
       .then(() => {
         setRegisteredIds((current) =>
-          current.includes(opportunityId) ? current : [...current, opportunityId],
+          current.includes(selectedOpportunity.id)
+            ? current
+            : [...current, selectedOpportunity.id],
         );
-        const message = "Saved. You are registered for this opportunity.";
+        const message = `Saved. You are registered for ${selectedOpportunity.title}.`;
         setSuccessMessage(message);
         toast.success(message);
+        handleCloseRegister();
       })
       .catch((requestError) => {
         if (isAuthError(requestError.message)) {
@@ -253,7 +316,7 @@ export default function OpportunityListPage({ type, title, description }) {
               <h2>Choose where you want to get involved</h2>
             </div>
             <p>
-              Each card uses live API data and keeps the join flow simple for this MVP demo.
+              Each card uses live API data and lets people join with their details directly from the page.
             </p>
           </div>
 
@@ -267,7 +330,7 @@ export default function OpportunityListPage({ type, title, description }) {
                   opportunity={opportunity}
                   isLoggedIn={isLoggedIn}
                   isRegistered={registeredIds.includes(opportunity.id)}
-                  onRegister={handleRegister}
+                  onOpenRegister={handleOpenRegister}
                   isSubmitting={registeringId === opportunity.id}
                 />
               ))}
@@ -280,6 +343,106 @@ export default function OpportunityListPage({ type, title, description }) {
             </section>
           )}
         </section>
+
+        {selectedOpportunity ? (
+          <section className="join-modal-backdrop" role="presentation" onClick={handleCloseRegister}>
+            <div
+              className="join-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="join-modal-title"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="join-modal-header">
+                <div className="meta-block">
+                  <span className={`opportunity-badge opportunity-type-${selectedOpportunity.type}`}>
+                    {formatType(selectedOpportunity.type)}
+                  </span>
+                  <h2 id="join-modal-title">Join {selectedOpportunity.title}</h2>
+                  <p>Fill in your details to reserve your spot.</p>
+                </div>
+                <button
+                  type="button"
+                  className="join-modal-close"
+                  onClick={handleCloseRegister}
+                  aria-label="Close join form"
+                >
+                  ×
+                </button>
+              </div>
+
+              <form className="join-form" onSubmit={handleRegisterSubmit}>
+                <div className="join-form-grid">
+                  <label>
+                    First name
+                    <input
+                      name="first_name"
+                      value={registrationForm.first_name}
+                      onChange={handleRegistrationChange}
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    Last name
+                    <input
+                      name="last_name"
+                      value={registrationForm.last_name}
+                      onChange={handleRegistrationChange}
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    Phone number
+                    <input
+                      name="phone_number"
+                      value={registrationForm.phone_number}
+                      onChange={handleRegistrationChange}
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    Age
+                    <input
+                      name="age"
+                      type="number"
+                      min="1"
+                      value={registrationForm.age}
+                      onChange={handleRegistrationChange}
+                      required
+                    />
+                  </label>
+
+                  <label className="join-form-full">
+                    Telegram username
+                    <input
+                      name="telegram_username"
+                      placeholder="@username"
+                      value={registrationForm.telegram_username}
+                      onChange={handleRegistrationChange}
+                      required
+                    />
+                  </label>
+                </div>
+
+                <div className="join-form-actions">
+                  <button type="button" className="button button-secondary" onClick={handleCloseRegister}>
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="button button-primary"
+                    disabled={registeringId === selectedOpportunity.id}
+                  >
+                    {registeringId === selectedOpportunity.id ? "Joining..." : "Confirm join"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+        ) : null}
       </main>
     </>
   );

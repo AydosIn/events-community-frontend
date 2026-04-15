@@ -16,7 +16,7 @@ function OpportunityCard({
   opportunity,
   isLoggedIn,
   isRegistered,
-  onRegister,
+  onOpenRegister,
   isSubmitting,
 }) {
   return (
@@ -57,7 +57,7 @@ function OpportunityCard({
             <button
               type="button"
               className="button button-primary"
-              onClick={() => onRegister(opportunity.id)}
+              onClick={() => onOpenRegister(opportunity)}
               disabled={isSubmitting}
               aria-busy={isSubmitting}
               aria-label={`Join ${opportunity.title}`}
