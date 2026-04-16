@@ -169,10 +169,6 @@ export default function HomePage() {
               <span className="section-label">How it works</span>
               <h2>A simple path from browsing to joining</h2>
             </div>
-            <p>
-              This MVP keeps things focused so first-time visitors can understand the platform in
-              a few seconds.
-            </p>
           </div>
 
           <div className="steps-grid">
@@ -192,19 +188,12 @@ export default function HomePage() {
               <span className="section-label">Why this platform</span>
               <h2>Made to feel clear, trustworthy, and useful</h2>
             </div>
-            <p>
-              Young people should quickly understand what exists locally and how to become part of it.
-            </p>
           </div>
 
           <div className="feature-grid">
             <article className="info-card">
               <h3>Local opportunities</h3>
               <p>Focus on clubs, projects, and workshops relevant to young people in Karakalpakstan.</p>
-            </article>
-            <article className="info-card">
-              <h3>Real data only</h3>
-              <p>Counts and listings come from the existing backend, with no mock replacements.</p>
             </article>
             <article className="info-card">
               <h3>Easy registration</h3>
@@ -221,11 +210,10 @@ export default function HomePage() {
               <span className="section-label">Featured opportunities</span>
               <h2>What people can join right now</h2>
             </div>
-            <p>A quick preview of live opportunities currently returned by the API.</p>
           </div>
 
           {loading ? (
-            <section className="empty-state">Loading opportunities from the backend...</section>
+            <section className="empty-state">Loading opportunities...</section>
           ) : featuredOpportunities.length > 0 ? (
             <section className="opportunity-grid">
               {featuredOpportunities.map((opportunity) => (

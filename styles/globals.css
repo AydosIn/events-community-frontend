@@ -487,10 +487,10 @@ img {
 .section-heading h2,
 .auth-panel h1,
 .opportunity-card h3,
-.info-card h3,
-.step-card h3,
+.info-panel h3,
+.step-item h3,
 .footer-brand h3,
-.faq-card h3 {
+.faq-item h3 {
   margin: 0;
 }
 
@@ -508,8 +508,8 @@ img {
 .section-copy,
 .auth-panel p,
 .opportunity-card p,
-.info-card p,
-.step-card p,
+.info-panel p,
+.step-item p,
 .footer-brand p,
 .footer-links a,
 .empty-state,
@@ -517,7 +517,7 @@ img {
 .field-note,
 .field-error,
 .status-banner,
-.faq-card p {
+.faq-item p {
   color: var(--muted);
   line-height: 1.65;
 }
@@ -620,13 +620,8 @@ img {
 }
 
 .stats-card,
-.opportunity-card,
 .auth-panel,
-.filter-card,
 .footer-card,
-.faq-card,
-.step-card,
-.info-card,
 .highlight-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -636,11 +631,6 @@ img {
 }
 
 .stats-card,
-.opportunity-card,
-.filter-card,
-.faq-card,
-.step-card,
-.info-card,
 .highlight-card {
   padding: 24px;
 }
@@ -659,26 +649,15 @@ img {
   color: var(--muted);
 }
 
-.step-card,
-.info-card,
+.step-item,
+.info-panel,
 .highlight-card {
   display: grid;
   gap: 14px;
 }
 
-.opportunity-card:hover,
-.info-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-strong);
-}
-
-.opportunity-card,
-.info-card {
-  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
-}
-
 .category-row strong,
-.info-card strong {
+.info-panel strong {
   color: var(--primary);
 }
 
@@ -732,9 +711,10 @@ img {
 
 .opportunity-card {
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
-  gap: 16px;
+  gap: 0;
   min-height: 100%;
+  padding: 28px 0;
+  border-top: 1px solid rgba(146, 176, 211, 0.32);
 }
 
 .opportunity-top {
@@ -762,6 +742,14 @@ img {
 .opportunity-title {
   font-size: 1.25rem;
   line-height: 1.3;
+}
+
+.opportunity-line {
+  padding: 18px 0;
+}
+
+.opportunity-line-top {
+  padding-top: 0;
 }
 
 .opportunity-description {
@@ -815,9 +803,12 @@ img {
   gap: 24px;
 }
 
-.filter-card {
+.filter-panel {
   display: grid;
   gap: 16px;
+  padding: 22px 0 26px;
+  border-top: 1px solid rgba(146, 176, 211, 0.32);
+  border-bottom: 1px solid rgba(146, 176, 211, 0.32);
 }
 
 .filter-bar {
@@ -1326,10 +1317,8 @@ img {
 
 .site-footer-inner {
   padding: 26px 28px;
-  border: 1px solid rgba(166, 194, 225, 0.36);
-  border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.84);
-  box-shadow: var(--shadow-sm);
+  border-top: 1px solid rgba(166, 194, 225, 0.36);
+  background: transparent;
 }
 
 .footer-columns {
@@ -1361,9 +1350,27 @@ img {
   overflow-wrap: anywhere;
 }
 
-.faq-card {
+.feature-grid,
+.steps-grid,
+.faq-list,
+.opportunity-grid {
+  gap: 0;
+}
+
+.info-panel,
+.step-item,
+.faq-item {
   display: grid;
-  gap: 14px;
+  gap: 12px;
+  padding: 22px 0;
+  border-top: 1px solid rgba(146, 176, 211, 0.32);
+}
+
+.feature-grid > :last-child,
+.steps-grid > :last-child,
+.faq-list > :last-child,
+.opportunity-grid > :last-child {
+  border-bottom: 1px solid rgba(146, 176, 211, 0.32);
 }
 
 .faq-toggle {
@@ -1522,13 +1529,8 @@ img {
   }
 
   .auth-panel,
-  .filter-card,
   .stats-card,
-  .opportunity-card,
   .join-modal,
-  .step-card,
-  .info-card,
-  .faq-card,
   .site-footer-inner {
     border-radius: 18px;
   }

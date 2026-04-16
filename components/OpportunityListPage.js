@@ -261,7 +261,7 @@ export default function OpportunityListPage({ type, title, description }) {
           </div>
         </section>
 
-        <section className="filter-card">
+        <section className="filter-panel">
           <div className="filter-bar">
             <div>
               <span className="section-label">Find by region</span>
@@ -316,7 +316,7 @@ export default function OpportunityListPage({ type, title, description }) {
               <h2>Choose where you want to get involved</h2>
             </div>
             <p>
-              Each card uses live API data and lets people join with their details directly from the page.
+              Live backend data appears directly on the page so people can browse and join without jumping through extra steps.
             </p>
           </div>
 
