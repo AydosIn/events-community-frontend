@@ -77,6 +77,9 @@ export default function AdminDashboardPage() {
             <Link href="/admin/registrations" className="button button-primary">
               View registrations
             </Link>
+            <Link href="/admin/registrations?type=club" className="button button-secondary">
+              Club members
+            </Link>
             <Link href="/admin/opportunities" className="button button-secondary">
               Manage opportunities
             </Link>
@@ -107,6 +110,14 @@ export default function AdminDashboardPage() {
             <p>See who joined what, search by person, and keep an eye on activity as usage grows.</p>
             <Link href="/admin/registrations" className="button button-secondary">
               Open registrations
+            </Link>
+          </article>
+          <article className="highlight-card">
+            <span className="section-label">Member lists</span>
+            <h3>Clubs and projects</h3>
+            <p>Jump into filtered views for clubs, projects, or workshops and review who joined each one.</p>
+            <Link href="/admin/registrations?type=project" className="button button-secondary">
+              View project members
             </Link>
           </article>
           <article className="highlight-card">
