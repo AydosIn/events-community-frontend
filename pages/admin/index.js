@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 import AdminLayout from "../../components/admin/AdminLayout";
+import AdminAnalyticsWidget from "../../components/admin/AdminAnalyticsWidget";
 import useAdminGuard from "../../components/admin/useAdminGuard";
 import { useToast } from "../../components/ToastProvider";
 import { clearSession, api } from "../../lib/api";
@@ -102,6 +103,8 @@ export default function AdminDashboardPage() {
             <strong>{loading ? "..." : overview?.registrations_count ?? 0}</strong>
           </article>
         </section>
+
+        <AdminAnalyticsWidget token={token} />
 
         <section className="feature-grid">
           <article className="highlight-card">

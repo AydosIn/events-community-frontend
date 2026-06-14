@@ -578,6 +578,30 @@ img {
   margin: 0;
 }
 
+.api-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.api-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9aa8b8;
+}
+
+.api-status-dot.is-up {
+  background: var(--success-text);
+}
+
+.api-status-dot.is-down {
+  background: var(--danger-text);
+}
+
 .eyebrow,
 .section-label,
 .opportunity-badge,
