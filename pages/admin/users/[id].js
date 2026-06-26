@@ -87,6 +87,7 @@ export default function AdminUserDetailPage() {
               <div className="admin-meta-list">
                 <span>Provider: {user.auth_provider || "local"}</span>
                 <span>Joined: {formatDateTime(user.created_at)}</span>
+                <span>Last login: {formatDateTime(user.last_login_at)}</span>
                 <span>Registrations: {user.registrations_count}</span>
               </div>
               <Link href="/admin/users" className="button button-secondary">

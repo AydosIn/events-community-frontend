@@ -119,6 +119,7 @@ export default function AdminUsersPage() {
                       <th>User</th>
                       <th>Provider</th>
                       <th>Joined</th>
+                      <th>Last login</th>
                       <th>Registrations</th>
                       <th>Admin</th>
                     </tr>
@@ -134,6 +135,7 @@ export default function AdminUsersPage() {
                         </td>
                         <td>{user.auth_provider || "local"}</td>
                         <td>{formatDateTime(user.created_at)}</td>
+                        <td>{formatDateTime(user.last_login_at)}</td>
                         <td>{user.registrations_count}</td>
                         <td>{user.is_admin ? "Yes" : "No"}</td>
                       </tr>
