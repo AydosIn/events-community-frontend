@@ -7,7 +7,7 @@ import AdminLayout from "../../../components/admin/AdminLayout";
 import useAdminGuard from "../../../components/admin/useAdminGuard";
 import { useToast } from "../../../components/ToastProvider";
 import { clearSession, api } from "../../../lib/api";
-import { formatDateTime, getNextOffset, isAdminAuthError } from "../../../lib/admin";
+import { formatDateTime, getNextOffset, isAdminAuthError, ADMIN_LOGIN_PATH } from "../../../lib/admin";
 
 const PAGE_LIMIT = 25;
 
@@ -50,7 +50,7 @@ export default function AdminUsersPage() {
         const message = requestError.message || "Failed to load users";
         if (isAdminAuthError(message)) {
           clearSession();
-          router.replace("/login");
+          router.replace(ADMIN_LOGIN_PATH);
           return;
         }
 

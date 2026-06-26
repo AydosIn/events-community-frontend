@@ -7,7 +7,7 @@ import AdminLayout from "../../components/admin/AdminLayout";
 import useAdminGuard from "../../components/admin/useAdminGuard";
 import { useToast } from "../../components/ToastProvider";
 import { clearSession, api } from "../../lib/api";
-import { formatDateTime, getNextOffset, isAdminAuthError } from "../../lib/admin";
+import { formatDateTime, getNextOffset, isAdminAuthError, ADMIN_LOGIN_PATH } from "../../lib/admin";
 
 const PAGE_LIMIT = 25;
 const DEFAULT_TYPE = "all";
@@ -85,7 +85,7 @@ export default function AdminRegistrationsPage() {
         const message = requestError.message || "Failed to load registrations";
         if (isAdminAuthError(message)) {
           clearSession();
-          router.replace("/login");
+          router.replace(ADMIN_LOGIN_PATH);
           return;
         }
 
@@ -138,7 +138,7 @@ export default function AdminRegistrationsPage() {
         const message = requestError.message || "Failed to delete registration";
         if (isAdminAuthError(message)) {
           clearSession();
-          router.replace("/login");
+          router.replace(ADMIN_LOGIN_PATH);
           return;
         }
 

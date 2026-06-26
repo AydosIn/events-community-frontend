@@ -7,7 +7,7 @@ import AdminLayout from "../../../components/admin/AdminLayout";
 import useAdminGuard from "../../../components/admin/useAdminGuard";
 import { useToast } from "../../../components/ToastProvider";
 import { clearSession, api } from "../../../lib/api";
-import { formatDateTime, isAdminAuthError, normalizeTelegramUsername } from "../../../lib/admin";
+import { formatDateTime, isAdminAuthError, normalizeTelegramUsername, ADMIN_LOGIN_PATH } from "../../../lib/admin";
 
 const emptyForm = {
   first_name: "",
@@ -71,7 +71,7 @@ export default function AdminRegistrationDetailPage() {
         const message = requestError.message || "Failed to load registration";
         if (isAdminAuthError(message)) {
           clearSession();
-          router.replace("/login");
+          router.replace(ADMIN_LOGIN_PATH);
           return;
         }
 
@@ -147,7 +147,7 @@ export default function AdminRegistrationDetailPage() {
         const message = requestError.message || "Failed to update registration";
         if (isAdminAuthError(message)) {
           clearSession();
-          router.replace("/login");
+          router.replace(ADMIN_LOGIN_PATH);
           return;
         }
 
@@ -183,7 +183,7 @@ export default function AdminRegistrationDetailPage() {
         const message = requestError.message || "Failed to delete registration";
         if (isAdminAuthError(message)) {
           clearSession();
-          router.replace("/login");
+          router.replace(ADMIN_LOGIN_PATH);
           return;
         }
 

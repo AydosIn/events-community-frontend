@@ -1,34 +1,46 @@
 import Head from "next/head";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-import Breadcrumbs from "../components/Breadcrumbs";
-import GoogleAuthButton from "../components/GoogleAuthButton";
-import { useToast } from "../components/ToastProvider";
-import { api, getStoredSession, setSession } from "../lib/api";
+import { useToast } from "../../components/ToastProvider";
+import { api, clearSession, getStoredSession, setSession } from "../../lib/api";
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
   const toast = useToast();
 
   useEffect(() => {
     const session = getStoredSession();
-    if (session.token) {
-      router.replace("/");
+
+    if (!session.token) {
+      setCheckingSession(false);
       return;
     }
 
-    if (router.query.registered === "1") {
-      const message = "Your account is ready. Log in to start joining opportunities.";
-      setSuccess(message);
-      toast.success(message);
-    }
-  }, [router, router.query.registered, toast]);
+    api
+      .getMe(session.token)
+      .then((user) => {
+        if (user.is_admin) {
+          setSession(session.token, {
+            full_name: user.full_name,
+            is_admin: true,
+          });
+          router.replace("/admin");
+          return;
+        }
+
+        clearSession();
+        setCheckingSession(false);
+      })
+      .catch(() => {
+        clearSession();
+        setCheckingSession(false);
+      });
+  }, [router]);
 
   function handleChange(event) {
     setError("");
@@ -41,19 +53,26 @@ export default function LoginPage() {
   function handleSubmit(event) {
     event.preventDefault();
     setError("");
-    setSuccess("");
     setLoading(true);
 
     api
       .login({ email: form.email, password: form.password })
       .then((data) => {
-        const fallbackName = form.email.split("@")[0] || "Community Member";
+        if (!data.is_admin) {
+          clearSession();
+          const message = "Admin access required";
+          setError(message);
+          toast.error(message);
+          return;
+        }
+
+        const fallbackName = form.email.split("@")[0] || "Admin";
         setSession(data.access_token, {
           full_name: data.full_name || fallbackName,
-          is_admin: Boolean(data.is_admin),
+          is_admin: true,
         });
-        toast.success("Logged in successfully.");
-        router.push("/");
+        toast.success("Admin access granted.");
+        router.push("/admin");
       })
       .catch((requestError) => {
         const message = requestError.message || "Login failed";
@@ -65,45 +84,26 @@ export default function LoginPage() {
       });
   }
 
-  function handleGoogleCredential(credential) {
-    setError("");
-    setSuccess("");
-    setLoading(true);
-
-    api
-      .googleAuth(credential)
-      .then((data) => {
-        setSession(data.access_token, {
-          full_name: data.full_name || "Community Member",
-          is_admin: Boolean(data.is_admin),
-        });
-        toast.success("Signed in with Google.");
-        router.push("/");
-      })
-      .catch((requestError) => {
-        const message = requestError.message || "Google sign-in failed";
-        setError(message);
-        toast.error(message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+  if (checkingSession) {
+    return (
+      <main className="page-shell">
+        <section className="empty-state">Checking admin access...</section>
+      </main>
+    );
   }
 
   return (
     <>
       <Head>
-        <title>Login | Events Community</title>
+        <title>Admin Login | Events Community</title>
       </Head>
 
       <main className="page-shell">
-        <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "Login" }]} />
-
         <section className="auth-page">
           <div className="auth-panel">
-            <span className="section-label">Login</span>
-            <h1>Welcome back</h1>
-            <p>Enter your email and password to continue.</p>
+            <span className="section-label">Admin access</span>
+            <h1>Sign in to admin</h1>
+            <p>Enter your admin email and password to access the dashboard.</p>
 
             <form onSubmit={handleSubmit} className="auth-form">
               <label>
@@ -111,9 +111,10 @@ export default function LoginPage() {
                 <input
                   name="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder="admin@example.com"
                   value={form.email}
                   onChange={handleChange}
+                  autoComplete="username"
                   required
                 />
               </label>
@@ -126,6 +127,7 @@ export default function LoginPage() {
                   placeholder="Enter your password"
                   value={form.password}
                   onChange={handleChange}
+                  autoComplete="current-password"
                   required
                 />
               </label>
@@ -137,21 +139,11 @@ export default function LoginPage() {
                   disabled={loading}
                   aria-busy={loading}
                 >
-                  {loading ? "Logging in..." : "Login"}
+                  {loading ? "Signing in..." : "Sign in"}
                 </button>
                 {error ? <p className="form-error">{error}</p> : null}
               </div>
             </form>
-
-            <div className="auth-divider" aria-hidden="true">
-              <span>or</span>
-            </div>
-
-            <GoogleAuthButton onCredential={handleGoogleCredential} disabled={loading} text="continue_with" />
-
-            <p className="auth-link">
-              Don&apos;t have an account? <Link href="/register">Sign up</Link>
-            </p>
           </div>
         </section>
       </main>

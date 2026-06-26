@@ -2,6 +2,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 import Breadcrumbs from "../Breadcrumbs";
+import { clearSession } from "../../lib/api";
+import { ADMIN_LOGIN_PATH } from "../../lib/admin";
 
 const adminNavItems = [
   { href: "/admin", label: "Dashboard", match: "/admin" },
@@ -18,6 +20,11 @@ export default function AdminLayout({ title, description, children, actions }) {
     breadcrumbs.push({ label: title });
   }
 
+  function handleLogout() {
+    clearSession();
+    router.replace(ADMIN_LOGIN_PATH);
+  }
+
   return (
     <main className="page-shell page-stack">
       <Breadcrumbs items={breadcrumbs} />
@@ -28,7 +35,12 @@ export default function AdminLayout({ title, description, children, actions }) {
           <h1>{title}</h1>
           <p>{description}</p>
         </div>
-        {actions ? <div className="admin-hero-actions">{actions}</div> : null}
+        <div className="admin-hero-actions">
+          {actions}
+          <button type="button" className="button button-secondary" onClick={handleLogout}>
+            Log out
+          </button>
+        </div>
       </section>
 
       <nav className="admin-nav" aria-label="Admin sections">

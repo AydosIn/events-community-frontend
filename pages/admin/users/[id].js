@@ -7,7 +7,7 @@ import AdminLayout from "../../../components/admin/AdminLayout";
 import useAdminGuard from "../../../components/admin/useAdminGuard";
 import { useToast } from "../../../components/ToastProvider";
 import { clearSession, api } from "../../../lib/api";
-import { formatDateTime, isAdminAuthError } from "../../../lib/admin";
+import { formatDateTime, isAdminAuthError, ADMIN_LOGIN_PATH } from "../../../lib/admin";
 
 export default function AdminUserDetailPage() {
   const router = useRouter();
@@ -42,7 +42,7 @@ export default function AdminUserDetailPage() {
         const message = requestError.message || "Failed to load user details";
         if (isAdminAuthError(message)) {
           clearSession();
-          router.replace("/login");
+          router.replace(ADMIN_LOGIN_PATH);
           return;
         }
 

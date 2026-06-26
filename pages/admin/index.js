@@ -8,7 +8,7 @@ import AdminAnalyticsWidget from "../../components/admin/AdminAnalyticsWidget";
 import useAdminGuard from "../../components/admin/useAdminGuard";
 import { useToast } from "../../components/ToastProvider";
 import { clearSession, api } from "../../lib/api";
-import { isAdminAuthError } from "../../lib/admin";
+import { isAdminAuthError, ADMIN_LOGIN_PATH } from "../../lib/admin";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -42,7 +42,7 @@ export default function AdminDashboardPage() {
         const message = requestError.message || "Failed to load admin overview";
         if (isAdminAuthError(message)) {
           clearSession();
-          router.replace("/login");
+          router.replace(ADMIN_LOGIN_PATH);
           return;
         }
 

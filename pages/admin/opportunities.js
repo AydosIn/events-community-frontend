@@ -6,7 +6,7 @@ import AdminLayout from "../../components/admin/AdminLayout";
 import useAdminGuard from "../../components/admin/useAdminGuard";
 import { useToast } from "../../components/ToastProvider";
 import { clearSession, api } from "../../lib/api";
-import { getNextOffset, isAdminAuthError } from "../../lib/admin";
+import { getNextOffset, isAdminAuthError, ADMIN_LOGIN_PATH } from "../../lib/admin";
 
 const PAGE_LIMIT = 25;
 const emptyForm = {
@@ -34,7 +34,7 @@ export default function AdminOpportunitiesPage() {
   function handleAuthFailure(message) {
     if (isAdminAuthError(message)) {
       clearSession();
-      router.replace("/login");
+      router.replace(ADMIN_LOGIN_PATH);
       return true;
     }
 
