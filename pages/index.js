@@ -24,10 +24,32 @@ export default function HomePage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [apiStatus, setApiStatus] = useState(null);
 
   useEffect(() => {
     const session = getStoredSession();
     setIsLoggedIn(Boolean(session.token));
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    api
+      .checkHealth()
+      .then(() => {
+        if (active) {
+          setApiStatus(true);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setApiStatus(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -103,11 +125,24 @@ export default function HomePage() {
         <section className="hero hero-centered">
           <div className="hero-intro">
             <span className="eyebrow">For students and young builders</span>
+            <span
+              className="api-status"
+              aria-label={`API status: ${apiStatus === null ? "checking" : apiStatus ? "online" : "offline"}`}
+            >
+              <span
+                className={`api-status-dot ${
+                  apiStatus === null ? "is-pending" : apiStatus ? "is-up" : "is-down"
+                }`}
+                aria-hidden="true"
+              />
+              API status
+            </span>
             <div className="hero-copy hero-copy-centered">
-              <h1>Discover clubs and youth projects in Karakalpakstan.</h1>
+              <h1>Discover clubs, projects, and workshops in Karakalpakstan.</h1>
               <p className="hero-subtitle">
                 Events Community helps school students, gap year learners, and young people in
-                Karakalpakstan find clubs, projects, and workshops they can actually join.
+                Karakalpakstan find opportunities they can actually join, with a clear path from
+                browsing to registration.
               </p>
             </div>
           </div>
