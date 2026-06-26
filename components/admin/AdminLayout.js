@@ -10,6 +10,7 @@ const adminNavItems = [
   { href: "/admin/registrations", label: "Registrations", match: "/admin/registrations" },
   { href: "/admin/opportunities", label: "Opportunities", match: "/admin/opportunities" },
   { href: "/admin/users", label: "Users", match: "/admin/users" },
+  { href: "/admin/admins", label: "Admins", match: "/admin/admins" },
 ];
 
 export default function AdminLayout({ title, description, children, actions }) {
