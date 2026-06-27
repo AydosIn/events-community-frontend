@@ -9,9 +9,7 @@ import { api, clearSession } from "../../lib/api";
 import { ADMIN_LOGIN_PATH, formatDateTime, isAdminAuthError } from "../../lib/admin";
 
 const emptyForm = {
-  full_name: "",
   email: "",
-  password: "",
 };
 
 export default function AdminAdminsPage() {
@@ -82,12 +80,10 @@ export default function AdminAdminsPage() {
 
     api
       .createAdminAdmin(token, {
-        full_name: form.full_name.trim(),
         email: form.email.trim(),
-        password: form.password,
       })
       .then(() => {
-        toast.success("Admin created.");
+        toast.success("Admin email added.");
         setForm(emptyForm);
         loadAdmins();
       })
@@ -114,7 +110,7 @@ export default function AdminAdminsPage() {
     setSaving(true);
 
     api
-      .deleteAdminAdmin(token, admin.id)
+      .deleteAdminAdmin(token, admin.email)
       .then(() => {
         toast.success("Admin access removed.");
         loadAdmins();
@@ -144,29 +140,18 @@ export default function AdminAdminsPage() {
 
       <AdminLayout
         title="Admins"
-        description="Create and manage the people who can access this admin panel."
+        description="Manage which email addresses can access this admin panel after normal login."
       >
         <section className="admin-grid">
           <article className="filter-card admin-form-card">
             <div className="section-heading">
               <div>
                 <span className="section-label">New admin</span>
-                <h2>Create admin account</h2>
+                <h2>Add admin email</h2>
               </div>
             </div>
 
             <form className="admin-form" onSubmit={handleSubmit}>
-              <label>
-                Full name
-                <input
-                  className="field"
-                  name="full_name"
-                  value={form.full_name}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
-
               <label>
                 Email
                 <input
@@ -179,20 +164,8 @@ export default function AdminAdminsPage() {
                 />
               </label>
 
-              <label>
-                Password
-                <input
-                  className="field"
-                  name="password"
-                  type="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
-
               <button type="submit" className="button button-primary" disabled={saving}>
-                {saving ? "Saving..." : "Create admin"}
+                {saving ? "Saving..." : "Add admin email"}
               </button>
 
               {error ? <p className="form-error">{error}</p> : null}
@@ -225,7 +198,7 @@ export default function AdminAdminsPage() {
                       {admins.map((admin) => (
                         <tr key={admin.id}>
                           <td>
-                            <strong>{admin.full_name}</strong>
+                            <strong>{admin.full_name || "Pending login"}</strong>
                           </td>
                           <td>{admin.email}</td>
                           <td>{formatDateTime(admin.created_at)}</td>

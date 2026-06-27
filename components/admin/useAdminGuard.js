@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 import { api, clearSession, getStoredSession, setSession } from "../../lib/api";
-import { ADMIN_LOGIN_PATH, isAdminAuthError } from "../../lib/admin";
+import { ADMIN_LOGIN_PATH, ADMIN_UNAUTHORIZED_PATH, isSessionAuthError } from "../../lib/admin";
 
 export default function useAdminGuard() {
   const router = useRouter();
@@ -30,9 +30,8 @@ export default function useAdminGuard() {
         }
 
         if (!user.is_admin) {
-          clearSession();
           setReady(false);
-          router.replace(ADMIN_LOGIN_PATH);
+          router.replace(ADMIN_UNAUTHORIZED_PATH);
           return;
         }
 
@@ -51,10 +50,16 @@ export default function useAdminGuard() {
         }
 
         const message = requestError.message || "Failed to verify admin access";
-        if (isAdminAuthError(message)) {
+        if (isSessionAuthError(message)) {
           clearSession();
           setReady(false);
           router.replace(ADMIN_LOGIN_PATH);
+          return;
+        }
+
+        if (message === "Admin access required") {
+          setReady(false);
+          router.replace(ADMIN_UNAUTHORIZED_PATH);
           return;
         }
 

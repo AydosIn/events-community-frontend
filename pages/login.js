@@ -53,7 +53,7 @@ export default function LoginPage() {
           is_admin: Boolean(data.is_admin),
         });
         toast.success("Logged in successfully.");
-        router.push("/");
+        router.push(data.is_admin ? "/admin" : "/");
       })
       .catch((requestError) => {
         const message = requestError.message || "Login failed";
@@ -78,7 +78,7 @@ export default function LoginPage() {
           is_admin: Boolean(data.is_admin),
         });
         toast.success("Signed in with Google.");
-        router.push("/");
+        router.push(data.is_admin ? "/admin" : "/");
       })
       .catch((requestError) => {
         const message = requestError.message || "Google sign-in failed";
