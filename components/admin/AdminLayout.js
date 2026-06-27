@@ -8,7 +8,9 @@ import { ADMIN_LOGIN_PATH } from "../../lib/admin";
 const adminNavItems = [
   { href: "/admin", label: "Dashboard", match: "/admin" },
   { href: "/admin/registrations", label: "Registrations", match: "/admin/registrations" },
-  { href: "/admin/opportunities", label: "Opportunities", match: "/admin/opportunities" },
+  { href: "/admin/opportunities?type=club", label: "Clubs", match: "/admin/opportunities", type: "club" },
+  { href: "/admin/opportunities?type=project", label: "Projects", match: "/admin/opportunities", type: "project" },
+  { href: "/admin/opportunities?type=workshop", label: "Workshops", match: "/admin/opportunities", type: "workshop" },
   { href: "/admin/users", label: "Users", match: "/admin/users" },
   { href: "/admin/admins", label: "Admins", match: "/admin/admins" },
 ];
@@ -46,8 +48,9 @@ export default function AdminLayout({ title, description, children, actions }) {
 
       <nav className="admin-nav" aria-label="Admin sections">
         {adminNavItems.map((item) => {
-          const isActive =
-            item.href === "/admin"
+          const isActive = item.type
+            ? router.pathname.startsWith(item.match) && router.query.type === item.type
+            : item.href === "/admin"
               ? router.pathname === "/admin"
               : router.pathname.startsWith(item.match);
 

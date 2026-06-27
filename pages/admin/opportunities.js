@@ -9,12 +9,24 @@ import { clearSession, api } from "../../lib/api";
 import { getNextOffset, isAdminAuthError, ADMIN_LOGIN_PATH } from "../../lib/admin";
 
 const PAGE_LIMIT = 25;
-const emptyForm = {
-  title: "",
-  description: "",
-  type: "club",
-  region_name: "",
+const opportunityTypes = {
+  club: "Clubs",
+  project: "Projects",
+  workshop: "Workshops",
 };
+
+function normalizeOpportunityType(value) {
+  return Object.prototype.hasOwnProperty.call(opportunityTypes, value) ? value : "club";
+}
+
+function getEmptyForm(type = "club") {
+  return {
+    title: "",
+    description: "",
+    type,
+    region_name: "",
+  };
+}
 
 export default function AdminOpportunitiesPage() {
   const router = useRouter();
@@ -24,7 +36,9 @@ export default function AdminOpportunitiesPage() {
   const [offset, setOffset] = useState(0);
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
-  const [form, setForm] = useState(emptyForm);
+  const selectedType = normalizeOpportunityType(router.query.type);
+  const selectedTypeLabel = opportunityTypes[selectedType];
+  const [form, setForm] = useState(() => getEmptyForm(selectedType));
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -50,7 +64,7 @@ export default function AdminOpportunitiesPage() {
     setError("");
 
     api
-      .getAdminOpportunities(token, { q: appliedSearch, limit: PAGE_LIMIT, offset })
+      .getAdminOpportunities(token, { q: appliedSearch, type: selectedType, limit: PAGE_LIMIT, offset })
       .then((data) => {
         setItems(data.items || []);
         setTotal(data.total || 0);
@@ -75,10 +89,18 @@ export default function AdminOpportunitiesPage() {
     }
 
     loadOpportunities();
-  }, [appliedSearch, offset, ready, token]);
+  }, [appliedSearch, offset, ready, selectedType, token]);
+
+  useEffect(() => {
+    setOffset(0);
+    setAppliedSearch("");
+    setSearchInput("");
+    setEditingId(null);
+    setForm(getEmptyForm(selectedType));
+  }, [selectedType]);
 
   function resetForm() {
-    setForm(emptyForm);
+    setForm(getEmptyForm(selectedType));
     setEditingId(null);
   }
 
@@ -170,19 +192,19 @@ export default function AdminOpportunitiesPage() {
   return (
     <>
       <Head>
-        <title>Admin Opportunities | Events Community</title>
+        <title>Admin {selectedTypeLabel} | Events Community</title>
       </Head>
 
       <AdminLayout
-        title="Opportunities"
-        description="Create and maintain the clubs, projects, and workshops that appear on the public site."
+        title={selectedTypeLabel}
+        description={`Create and maintain the ${selectedTypeLabel.toLowerCase()} that appear on the public site.`}
       >
         <section className="admin-grid">
           <article className="filter-card admin-form-card">
             <div className="section-heading">
               <div>
-                <span className="section-label">{editingId ? "Edit item" : "New item"}</span>
-                <h2>{editingId ? "Update opportunity" : "Create opportunity"}</h2>
+                <span className="section-label">{editingId ? "Edit item" : `New ${selectedTypeLabel.toLowerCase()}`}</span>
+                <h2>{editingId ? "Update item" : `Create ${selectedTypeLabel.toLowerCase()}`}</h2>
               </div>
             </div>
 
@@ -254,7 +276,7 @@ export default function AdminOpportunitiesPage() {
               <input
                 className="field"
                 type="text"
-                placeholder="Search title, type, region, or description"
+                placeholder={`Search ${selectedTypeLabel.toLowerCase()} by title, region, or description`}
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
               />
@@ -333,7 +355,7 @@ export default function AdminOpportunitiesPage() {
                   </div>
                 </>
               ) : (
-                <div className="empty-state">No opportunities matched the current search.</div>
+                <div className="empty-state">No {selectedTypeLabel.toLowerCase()} matched the current search.</div>
               )}
             </div>
           </article>

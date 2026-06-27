@@ -78,11 +78,14 @@ export default function AdminDashboardPage() {
             <Link href="/admin/registrations" className="button button-primary">
               View registrations
             </Link>
-            <Link href="/admin/registrations?type=club" className="button button-secondary">
-              Club members
+            <Link href="/admin/opportunities?type=club" className="button button-secondary">
+              Clubs
             </Link>
-            <Link href="/admin/opportunities" className="button button-secondary">
-              Manage opportunities
+            <Link href="/admin/opportunities?type=project" className="button button-secondary">
+              Projects
+            </Link>
+            <Link href="/admin/opportunities?type=workshop" className="button button-secondary">
+              Workshops
             </Link>
           </>
         }
@@ -125,11 +128,19 @@ export default function AdminDashboardPage() {
           </article>
           <article className="highlight-card">
             <span className="section-label">Content control</span>
-            <h3>Opportunity management</h3>
-            <p>Create, update, or remove opportunities without editing seed data or opening the database.</p>
-            <Link href="/admin/opportunities" className="button button-secondary">
-              Open opportunities
-            </Link>
+            <h3>Clubs, projects, and workshops</h3>
+            <p>Create, update, or remove each opportunity type from its own filtered admin view.</p>
+            <div className="inline-actions">
+              <Link href="/admin/opportunities?type=club" className="button button-secondary">
+                Manage clubs
+              </Link>
+              <Link href="/admin/opportunities?type=project" className="button button-secondary">
+                Manage projects
+              </Link>
+              <Link href="/admin/opportunities?type=workshop" className="button button-secondary">
+                Manage workshops
+              </Link>
+            </div>
           </article>
           <article className="highlight-card">
             <span className="section-label">User visibility</span>
