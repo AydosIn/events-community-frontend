@@ -7,6 +7,8 @@ import Breadcrumbs from "../components/Breadcrumbs";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 import { useToast } from "../components/ToastProvider";
 import { api, getStoredSession, setSession } from "../lib/api";
+import { getPostAuthRedirect } from "../lib/navigation";
+import { getFirstError, validateSignupForm } from "../lib/validation";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -37,13 +39,29 @@ export default function RegisterPage() {
   function handleSubmit(event) {
     event.preventDefault();
     setError("");
+
+    const validation = validateSignupForm(form);
+    if (!validation.valid) {
+      const message = getFirstError(validation.errors);
+      setError(message);
+      toast.error(message);
+      return;
+    }
+
     setLoading(true);
 
     api
-      .register(form)
+      .register(validation.values)
       .then(() => {
         toast.success("Account created successfully.");
-        router.push("/login?registered=1");
+        const params = new URLSearchParams({ registered: "1" });
+        if (typeof router.query.next === "string") {
+          params.set("next", router.query.next);
+        }
+        if (typeof router.query.join === "string") {
+          params.set("join", router.query.join);
+        }
+        router.push(`/login?${params.toString()}`);
       })
       .catch((requestError) => {
         const message = requestError.message || "Registration failed";
@@ -67,7 +85,7 @@ export default function RegisterPage() {
           is_admin: Boolean(data.is_admin),
         });
         toast.success("Account created with Google.");
-        router.push(data.is_admin ? "/admin" : "/");
+        router.push(getPostAuthRedirect(router.query, data.is_admin));
       })
       .catch((requestError) => {
         const message = requestError.message || "Google sign-up failed";

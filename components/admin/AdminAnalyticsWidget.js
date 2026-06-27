@@ -89,6 +89,7 @@ export default function AdminAnalyticsWidget({ token }) {
   const [analytics, setAnalytics] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     if (!token) {
@@ -122,7 +123,7 @@ export default function AdminAnalyticsWidget({ token }) {
     return () => {
       active = false;
     };
-  }, [token]);
+  }, [reloadKey, token]);
 
   const maxTypeCount = useMemo(
     () => Math.max(0, ...(analytics?.registrations_by_type?.map((item) => item.count) || [0])),
@@ -143,6 +144,13 @@ export default function AdminAnalyticsWidget({ token }) {
       <section className="rounded-3xl border border-red-200 bg-red-50 p-6 text-red-800 shadow-sm">
         <p className="text-sm font-semibold uppercase tracking-wide text-red-600">Analytics unavailable</p>
         <p className="mt-2 text-base">{error}</p>
+        <button
+          type="button"
+          className="button button-secondary mt-4"
+          onClick={() => setReloadKey((value) => value + 1)}
+        >
+          Try again
+        </button>
       </section>
     );
   }

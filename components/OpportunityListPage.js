@@ -6,6 +6,8 @@ import Breadcrumbs from "./Breadcrumbs";
 import OpportunityCard from "./OpportunityCard";
 import { useToast } from "./ToastProvider";
 import { api, clearSession, getStoredSession } from "../lib/api";
+import { buildLoginUrl, getOpportunityListPath } from "../lib/navigation";
+import { getFirstError, validateRegistrationForm } from "../lib/validation";
 
 function isAuthError(message) {
   return (
@@ -41,6 +43,8 @@ export default function OpportunityListPage({ type, title, description }) {
   const [token, setToken] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [registeringId, setRegisteringId] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
@@ -69,6 +73,7 @@ export default function OpportunityListPage({ type, title, description }) {
 
     setLoading(true);
     setError("");
+    setLoadFailed(false);
     setSuccessMessage("");
 
     api
@@ -83,6 +88,7 @@ export default function OpportunityListPage({ type, title, description }) {
           const message = requestError.message || "Failed to load opportunities";
           setError(message);
           setOpportunities([]);
+          setLoadFailed(true);
           toast.error(message);
         }
       })
@@ -95,7 +101,28 @@ export default function OpportunityListPage({ type, title, description }) {
     return () => {
       active = false;
     };
-  }, [appliedRegion, toast, type]);
+  }, [appliedRegion, reloadKey, toast, type]);
+
+  useEffect(() => {
+    if (!router.isReady || !token || !router.query.join || opportunities.length === 0) {
+      return;
+    }
+
+    const joinId = Number(router.query.join);
+    if (!Number.isInteger(joinId)) {
+      return;
+    }
+
+    const opportunity = opportunities.find((item) => item.id === joinId);
+    if (!opportunity || registeredIds.includes(joinId)) {
+      return;
+    }
+
+    setSelectedOpportunity(opportunity);
+    setRegistrationForm(initialRegistrationForm);
+    setError("");
+    setSuccessMessage("");
+  }, [opportunities, registeredIds, router.isReady, router.query.join, token]);
 
   useEffect(() => {
     let active = true;
@@ -133,7 +160,12 @@ export default function OpportunityListPage({ type, title, description }) {
   function handleOpenRegister(opportunity) {
     if (!token) {
       clearSession();
-      router.push("/login");
+      router.push(
+        buildLoginUrl({
+          nextPath: getOpportunityListPath(type),
+          joinId: opportunity.id,
+        }),
+      );
       return;
     }
 
@@ -161,11 +193,24 @@ export default function OpportunityListPage({ type, title, description }) {
 
     if (!token) {
       clearSession();
-      router.push("/login");
+      router.push(
+        buildLoginUrl({
+          nextPath: getOpportunityListPath(type),
+          joinId: selectedOpportunity?.id,
+        }),
+      );
       return;
     }
 
     if (!selectedOpportunity) {
+      return;
+    }
+
+    const validation = validateRegistrationForm(registrationForm);
+    if (!validation.valid) {
+      const message = getFirstError(validation.errors);
+      setError(message);
+      toast.error(message);
       return;
     }
 
@@ -177,11 +222,7 @@ export default function OpportunityListPage({ type, title, description }) {
       .registerForOpportunity(
         {
           opportunity_id: selectedOpportunity.id,
-          first_name: registrationForm.first_name.trim(),
-          last_name: registrationForm.last_name.trim(),
-          age: Number(registrationForm.age),
-          phone_number: registrationForm.phone_number.trim(),
-          telegram_username: registrationForm.telegram_username.trim(),
+          ...validation.values,
         },
         token,
       )
@@ -200,7 +241,12 @@ export default function OpportunityListPage({ type, title, description }) {
         if (isAuthError(requestError.message)) {
           clearSession();
           toast.error("Your session expired. Please log in again.");
-          router.push("/login");
+          router.push(
+            buildLoginUrl({
+              nextPath: getOpportunityListPath(type),
+              joinId: selectedOpportunity?.id,
+            }),
+          );
           return;
         }
 
@@ -308,6 +354,13 @@ export default function OpportunityListPage({ type, title, description }) {
 
         {successMessage ? <section className="status-banner success-state">{successMessage}</section> : null}
         {error ? <section className="status-banner error-state">{error}</section> : null}
+        {loadFailed ? (
+          <section className="status-banner">
+            <button type="button" className="button button-secondary" onClick={() => setReloadKey((value) => value + 1)}>
+              Try again
+            </button>
+          </section>
+        ) : null}
 
         <section id="opportunity-results" className="section-block">
           <div className="section-heading">

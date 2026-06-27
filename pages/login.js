@@ -7,6 +7,7 @@ import Breadcrumbs from "../components/Breadcrumbs";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 import { useToast } from "../components/ToastProvider";
 import { api, getStoredSession, setSession } from "../lib/api";
+import { getPostAuthRedirect } from "../lib/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export default function LoginPage() {
   useEffect(() => {
     const session = getStoredSession();
     if (session.token) {
-      router.replace("/");
+      router.replace(getPostAuthRedirect(router.query, session.user?.is_admin));
       return;
     }
 
@@ -28,7 +29,7 @@ export default function LoginPage() {
       setSuccess(message);
       toast.success(message);
     }
-  }, [router, router.query.registered, toast]);
+  }, [router, router.query, toast]);
 
   function handleChange(event) {
     setError("");
@@ -53,7 +54,7 @@ export default function LoginPage() {
           is_admin: Boolean(data.is_admin),
         });
         toast.success("Logged in successfully.");
-        router.push(data.is_admin ? "/admin" : "/");
+        router.push(getPostAuthRedirect(router.query, data.is_admin));
       })
       .catch((requestError) => {
         const message = requestError.message || "Login failed";
@@ -78,7 +79,7 @@ export default function LoginPage() {
           is_admin: Boolean(data.is_admin),
         });
         toast.success("Signed in with Google.");
-        router.push(data.is_admin ? "/admin" : "/");
+        router.push(getPostAuthRedirect(router.query, data.is_admin));
       })
       .catch((requestError) => {
         const message = requestError.message || "Google sign-in failed";
@@ -150,7 +151,19 @@ export default function LoginPage() {
             <GoogleAuthButton onCredential={handleGoogleCredential} disabled={loading} text="continue_with" />
 
             <p className="auth-link">
-              Don&apos;t have an account? <Link href="/register">Sign up</Link>
+              Don&apos;t have an account?{" "}
+              <Link
+                href={
+                  router.query.next || router.query.join
+                    ? `/register?${new URLSearchParams({
+                        ...(typeof router.query.next === "string" ? { next: router.query.next } : {}),
+                        ...(typeof router.query.join === "string" ? { join: router.query.join } : {}),
+                      }).toString()}`
+                    : "/register"
+                }
+              >
+                Sign up
+              </Link>
             </p>
           </div>
         </section>

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 import AdminLayout from "../../components/admin/AdminLayout";
+import ConfirmDeleteModal from "../../components/admin/ConfirmDeleteModal";
 import useAdminGuard from "../../components/admin/useAdminGuard";
 import { useToast } from "../../components/ToastProvider";
 import { api, clearSession } from "../../lib/api";
@@ -20,6 +21,7 @@ export default function AdminAdminsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [revokeTarget, setRevokeTarget] = useState(null);
   const toast = useToast();
 
   function handleAuthFailure(message) {
@@ -102,17 +104,21 @@ export default function AdminAdminsPage() {
   }
 
   function handleRevoke(admin) {
-    const confirmed = window.confirm(`Remove admin access for ${admin.email}?`);
-    if (!confirmed) {
+    setRevokeTarget(admin);
+  }
+
+  function confirmRevoke() {
+    if (!revokeTarget) {
       return;
     }
 
     setSaving(true);
 
     api
-      .deleteAdminAdmin(token, admin.email)
+      .deleteAdminAdmin(token, revokeTarget.email)
       .then(() => {
         toast.success("Admin access removed.");
+        setRevokeTarget(null);
         loadAdmins();
       })
       .catch((requestError) => {
@@ -224,6 +230,17 @@ export default function AdminAdminsPage() {
           </article>
         </section>
       </AdminLayout>
+
+      <ConfirmDeleteModal
+        open={Boolean(revokeTarget)}
+        title="Remove admin access"
+        description={`This will remove admin panel access for ${revokeTarget?.email}.`}
+        confirmLabel="Remove admin"
+        confirmText={revokeTarget?.email || ""}
+        onCancel={() => setRevokeTarget(null)}
+        onConfirm={confirmRevoke}
+        loading={saving}
+      />
     </>
   );
 }

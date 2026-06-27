@@ -25,7 +25,9 @@ export default function AdminRegistrationsPage() {
   const [opportunities, setOpportunities] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const toast = useToast();
 
   useEffect(() => {
@@ -101,7 +103,34 @@ export default function AdminRegistrationsPage() {
     return () => {
       active = false;
     };
-  }, [appliedSearch, offset, opportunityId, ready, router, toast, token, typeFilter]);
+  }, [appliedSearch, offset, opportunityId, ready, reloadKey, router, toast, token, typeFilter]);
+
+  function handleExport() {
+    setExporting(true);
+
+    api
+      .exportAdminRegistrations(token, {
+        q: appliedSearch,
+        opportunity_id: opportunityId || undefined,
+        type: typeFilter !== DEFAULT_TYPE ? typeFilter : undefined,
+      })
+      .then(() => {
+        toast.success("Registrations exported.");
+      })
+      .catch((requestError) => {
+        const message = requestError.message || "Failed to export registrations";
+        if (isAdminAuthError(message)) {
+          clearSession();
+          router.replace(ADMIN_LOGIN_PATH);
+          return;
+        }
+
+        toast.error(message);
+      })
+      .finally(() => {
+        setExporting(false);
+      });
+  }
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -205,18 +234,28 @@ export default function AdminRegistrationsPage() {
             <button type="submit" className="button button-primary">
               Search
             </button>
+            <button type="button" className="button button-secondary" onClick={handleExport} disabled={exporting}>
+              {exporting ? "Exporting..." : "Export CSV"}
+            </button>
             <button type="button" className="button button-secondary" onClick={handleClear}>
               Clear
             </button>
           </form>
+
+          {error ? (
+            <section className="status-banner error-state">
+              <p>{error}</p>
+              <button type="button" className="button button-secondary" onClick={() => setReloadKey((value) => value + 1)}>
+                Try again
+              </button>
+            </section>
+          ) : null}
           <div className="filter-status-row">
             <p className="section-copy">
               {loading ? "Loading registrations..." : `Showing ${registrations.length} of ${total} registrations.`}
             </p>
           </div>
         </section>
-
-        {error ? <section className="status-banner error-state">{error}</section> : null}
 
         <section className="admin-table-card">
           {loading ? (

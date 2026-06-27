@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 import AdminLayout from "../../components/admin/AdminLayout";
+import ConfirmDeleteModal from "../../components/admin/ConfirmDeleteModal";
 import useAdminGuard from "../../components/admin/useAdminGuard";
 import { useToast } from "../../components/ToastProvider";
 import { clearSession, api } from "../../lib/api";
 import { getNextOffset, isAdminAuthError, ADMIN_LOGIN_PATH } from "../../lib/admin";
+import { getFirstError, validateOpportunityForm } from "../../lib/validation";
 
 const PAGE_LIMIT = 25;
 const opportunityTypes = {
@@ -43,6 +45,7 @@ export default function AdminOpportunitiesPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const toast = useToast();
 
   function handleAuthFailure(message) {
@@ -122,20 +125,24 @@ export default function AdminOpportunitiesPage() {
   }
 
   function handleDelete(item) {
-    const confirmed = window.confirm(`Delete "${item.title}"? This also removes its registrations.`);
-    if (!confirmed) {
+    setDeleteTarget(item);
+  }
+
+  function confirmDelete() {
+    if (!deleteTarget) {
       return;
     }
 
     setSaving(true);
 
     api
-      .deleteAdminOpportunity(token, item.id)
+      .deleteAdminOpportunity(token, deleteTarget.id)
       .then(() => {
         toast.success("Opportunity deleted.");
-        if (editingId === item.id) {
+        if (editingId === deleteTarget.id) {
           resetForm();
         }
+        setDeleteTarget(null);
         loadOpportunities();
       })
       .catch((requestError) => {
@@ -153,12 +160,21 @@ export default function AdminOpportunitiesPage() {
 
   function handleSubmit(event) {
     event.preventDefault();
+
+    const validation = validateOpportunityForm(form);
+    if (!validation.valid) {
+      const message = getFirstError(validation.errors);
+      setError(message);
+      toast.error(message);
+      return;
+    }
+
     setSaving(true);
     setError("");
 
     const request = editingId
-      ? api.updateAdminOpportunity(token, editingId, form)
-      : api.createAdminOpportunity(token, form);
+      ? api.updateAdminOpportunity(token, editingId, validation.values)
+      : api.createAdminOpportunity(token, validation.values);
 
     request
       .then(() => {
@@ -361,6 +377,17 @@ export default function AdminOpportunitiesPage() {
           </article>
         </section>
       </AdminLayout>
+
+      <ConfirmDeleteModal
+        open={Boolean(deleteTarget)}
+        title="Delete opportunity"
+        description={`This will permanently delete "${deleteTarget?.title}" and all registrations linked to it.`}
+        confirmLabel="Delete opportunity"
+        confirmText={deleteTarget?.title || ""}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        loading={saving}
+      />
     </>
   );
 }
