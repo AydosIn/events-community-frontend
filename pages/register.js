@@ -52,16 +52,13 @@ export default function RegisterPage() {
 
     api
       .register(validation.values)
-      .then(() => {
-        toast.success("Account created successfully.");
-        const params = new URLSearchParams({ registered: "1" });
-        if (typeof router.query.next === "string") {
-          params.set("next", router.query.next);
-        }
-        if (typeof router.query.join === "string") {
-          params.set("join", router.query.join);
-        }
-        router.push(`/login?${params.toString()}`);
+      .then((data) => {
+        setSession(data.access_token, {
+          full_name: data.full_name || validation.values.full_name,
+          is_admin: Boolean(data.is_admin),
+        });
+        toast.success("Account ready. You are now logged in.");
+        router.push(getPostAuthRedirect(router.query, data.is_admin));
       })
       .catch((requestError) => {
         const message = requestError.message || "Registration failed";

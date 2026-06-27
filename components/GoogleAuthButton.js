@@ -3,9 +3,12 @@ import { useEffect, useId, useRef, useState } from "react";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 
+function isGoogleSdkReady() {
+  return typeof window !== "undefined" && Boolean(window.google?.accounts?.id);
+}
+
 export default function GoogleAuthButton({ onCredential, disabled = false, text = "continue_with" }) {
   const containerRef = useRef(null);
-  const scriptLoadedRef = useRef(false);
   const initializedRef = useRef(false);
   const callbackRef = useRef(onCredential);
   const [scriptLoaded, setScriptLoaded] = useState(false);
@@ -14,7 +17,13 @@ export default function GoogleAuthButton({ onCredential, disabled = false, text 
   callbackRef.current = onCredential;
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || !scriptLoaded || !containerRef.current || !window.google || disabled) {
+    if (isGoogleSdkReady()) {
+      setScriptLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID || !scriptLoaded || !containerRef.current || !isGoogleSdkReady() || disabled) {
       return;
     }
 
@@ -22,7 +31,9 @@ export default function GoogleAuthButton({ onCredential, disabled = false, text 
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: (response) => {
-          callbackRef.current(response.credential);
+          if (response?.credential) {
+            callbackRef.current(response.credential);
+          }
         },
       });
 
@@ -51,14 +62,21 @@ export default function GoogleAuthButton({ onCredential, disabled = false, text 
         src="https://accounts.google.com/gsi/client"
         strategy="afterInteractive"
         onLoad={() => {
-          scriptLoadedRef.current = true;
-          setScriptLoaded(true);
+          if (isGoogleSdkReady()) {
+            setScriptLoaded(true);
+          }
+        }}
+        onReady={() => {
+          if (isGoogleSdkReady()) {
+            setScriptLoaded(true);
+          }
         }}
       />
       <div className="google-auth-block">
         <div
           ref={containerRef}
           className={`google-auth-button-shell${disabled ? " google-auth-button-shell-disabled" : ""}`}
+          aria-hidden={disabled}
         />
       </div>
     </>
