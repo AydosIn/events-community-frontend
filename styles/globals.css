@@ -492,7 +492,8 @@ img {
 .step-item h3,
 .step-card h3,
 .footer-brand h3,
-.faq-item h3 {
+.faq-item h3,
+.faq-card h3 {
   margin: 0;
 }
 
@@ -521,7 +522,9 @@ img {
 .field-note,
 .field-error,
 .status-banner,
-.faq-item p {
+.faq-item p,
+.faq-card p,
+.faq-answer p {
   color: var(--muted);
   line-height: 1.65;
 }
@@ -642,9 +645,13 @@ img {
 .category-grid,
 .feature-grid,
 .opportunity-grid,
-.steps-grid,
-.faq-list {
+.steps-grid {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.faq-list {
+  grid-template-columns: 1fr;
+  gap: 16px;
 }
 
 .stats-card,
@@ -652,7 +659,8 @@ img {
 .footer-card,
 .highlight-card,
 .step-card,
-.info-card {
+.info-card,
+.faq-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface);
@@ -663,7 +671,8 @@ img {
 .stats-card,
 .highlight-card,
 .step-card,
-.info-card {
+.info-card,
+.faq-card {
   padding: 24px;
 }
 
@@ -685,6 +694,7 @@ img {
 .info-panel,
 .step-card,
 .info-card,
+.faq-card,
 .highlight-card {
   display: grid;
   gap: 12px;
@@ -1389,7 +1399,28 @@ img {
   gap: 24px;
 }
 
-.faq-list,
+.faq-page-header {
+  display: grid;
+  gap: 12px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(146, 176, 211, 0.32);
+}
+
+.faq-page-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.faq-page-header p {
+  margin: 0;
+  max-width: 52ch;
+  color: var(--muted);
+  line-height: 1.65;
+  font-size: 1.05rem;
+}
+
 .opportunity-grid {
   gap: 0;
 }
@@ -1403,7 +1434,6 @@ img {
   border-top: 1px solid rgba(146, 176, 211, 0.32);
 }
 
-.faq-list > :last-child,
 .opportunity-grid > :last-child {
   border-bottom: 1px solid rgba(146, 176, 211, 0.32);
 }
@@ -1423,16 +1453,27 @@ img {
   text-align: left;
 }
 
-.faq-symbol {
+.faq-answer p {
+  margin: 0;
+}
+
+.faq-chevron {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  background: rgba(220, 236, 255, 0.8);
-  color: var(--primary);
   flex-shrink: 0;
+  color: var(--muted);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.faq-chevron.is-open {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+.faq-toggle:hover .faq-chevron,
+.faq-toggle:focus-visible .faq-chevron {
+  color: var(--primary);
 }
 
 @media (max-width: 920px) {
