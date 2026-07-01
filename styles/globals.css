@@ -488,7 +488,9 @@ img {
 .auth-panel h1,
 .opportunity-card h3,
 .info-panel h3,
+.info-card h3,
 .step-item h3,
+.step-card h3,
 .footer-brand h3,
 .faq-item h3 {
   margin: 0;
@@ -509,7 +511,9 @@ img {
 .auth-panel p,
 .opportunity-card p,
 .info-panel p,
+.info-card p,
 .step-item p,
+.step-card p,
 .footer-brand p,
 .footer-links a,
 .empty-state,
@@ -646,7 +650,9 @@ img {
 .stats-card,
 .auth-panel,
 .footer-card,
-.highlight-card {
+.highlight-card,
+.step-card,
+.info-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface);
@@ -655,7 +661,9 @@ img {
 }
 
 .stats-card,
-.highlight-card {
+.highlight-card,
+.step-card,
+.info-card {
   padding: 24px;
 }
 
@@ -675,9 +683,11 @@ img {
 
 .step-item,
 .info-panel,
+.step-card,
+.info-card,
 .highlight-card {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .category-row strong,
@@ -1374,8 +1384,11 @@ img {
   overflow-wrap: anywhere;
 }
 
-.feature-grid,
 .steps-grid,
+.feature-grid {
+  gap: 24px;
+}
+
 .faq-list,
 .opportunity-grid {
   gap: 0;
@@ -1390,8 +1403,6 @@ img {
   border-top: 1px solid rgba(146, 176, 211, 0.32);
 }
 
-.feature-grid > :last-child,
-.steps-grid > :last-child,
 .faq-list > :last-child,
 .opportunity-grid > :last-child {
   border-bottom: 1px solid rgba(146, 176, 211, 0.32);
