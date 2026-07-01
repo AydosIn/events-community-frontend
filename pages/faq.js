@@ -31,8 +31,24 @@ const faqItems = [
   },
 ];
 
+function FaqChevron({ isOpen }) {
+  return (
+    <span className={`faq-chevron${isOpen ? " is-open" : ""}`} aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path
+          d="M4 6L8 10L12 6"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
+  );
+}
+
 export default function FaqPage() {
-  const [openIndex, setOpenIndex] = useState(0);
+  const [openIndex, setOpenIndex] = useState(-1);
 
   return (
     <>
@@ -43,15 +59,9 @@ export default function FaqPage() {
       <main className="page-shell page-stack">
         <Breadcrumbs items={[{ href: "/", label: "Home" }, { label: "FAQ" }]} />
 
-        <section className="hero">
-          <span className="eyebrow">FAQ</span>
-          <div className="hero-copy">
-            <h1>Frequently asked questions</h1>
-            <p className="hero-subtitle">
-              Quick answers about browsing opportunities, creating an account, and joining clubs,
-              projects, and workshops through the current MVP.
-            </p>
-          </div>
+        <section className="faq-page-header">
+          <h1>Frequently asked questions</h1>
+          <p>Answers to the things students ask us most often.</p>
         </section>
 
         <section className="faq-list">
@@ -65,12 +75,14 @@ export default function FaqPage() {
                 onClick={() => setOpenIndex((current) => (current === index ? -1 : index))}
               >
                 <span>{item.question}</span>
-                <span className="faq-symbol" aria-hidden="true">
-                  {openIndex === index ? "-" : "+"}
-                </span>
+                <FaqChevron isOpen={openIndex === index} />
               </button>
 
-              {openIndex === index ? <p id={`faq-answer-${index}`}>{item.answer}</p> : null}
+              {openIndex === index ? (
+                <div className="faq-answer" id={`faq-answer-${index}`}>
+                  <p>{item.answer}</p>
+                </div>
+              ) : null}
             </article>
           ))}
         </section>
